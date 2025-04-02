@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Brain Gene Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mouse Brain Gene Portal</h1>
+            <p>Search for genes to see the spatial expression in mouse brain</p>
+        </header>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search for gene name or Ensembl ID">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-options">
+                <span>Results: </span>
+                <span id="resultCount">0</span>
+            </div>
+        </div>
+        
+        <div class="results-container">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>Loading files...</p>
+            </div>
+            <ul id="resultsList"></ul>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
