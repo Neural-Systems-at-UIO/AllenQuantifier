@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     
                     <div class="gene-meta">
-                        ${gene.synonyms && gene.synonyms.length ? `
+                        ${gene.synonyms ? `
                         <div class="meta-section">
                             <span class="meta-label">Synonyms:</span>
                             <span class="meta-value">${Array.isArray(gene.synonyms) ? gene.synonyms.join(', ') : gene.synonyms}</span>
