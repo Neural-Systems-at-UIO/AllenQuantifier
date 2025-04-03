@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const li = document.createElement('li');
             li.className = 'result-item';
             
-            // Create the single link for the entire card
-            const filePath = `/genes/${encodeURIComponent(gene.gene_name)}.txt`; // or your preferred file type
+            // Generate the target URL with the correct gene information
+            const filePath = `https://atlases.ebrains.eu/viewer-staging/#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fbuckets%2Fdeepslice%2Fsebastien_data_sharing%2Fdp_test%2Foutput%2F${encodeURIComponent(gene.gene_name)}_interp_25um.nii.gz`;
             
             li.innerHTML = `
                 <a href="${filePath}" target="_blank" class="result-link">
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         addPaginationControls();
     }
-    function addPaginationControls() {
+        function addPaginationControls() {
         const totalPages = Math.ceil(filteredData.length / itemsPerPage);
         
         if (totalPages <= 1) return;
