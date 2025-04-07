@@ -356,3 +356,67 @@ footer {
         width: calc(100% - 4rem); /* Match container padding */
     }
 }
+/* Add to your CSS file */
+.animal-count {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.animal-count i {
+    margin-right: 5px;
+    font-size: 0.9em;
+}
+
+.animal-count span {
+    font-size: 0.9em;
+}
+
+/* Adjust the result-header to accommodate the new element */
+.result-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    justify-content: space-between;
+}
+
+.result-title {
+    flex: 1;
+    margin-right: 15px;
+}
+/* Replace the previous .animal-count styles with these: */
+.mouse-count {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.mouse-count-inner {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.mouse-count i {
+    font-size: 0.9em;
+}
+
+/* Adjust the result-header spacing */
+.result-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 15px;
+}
+
+.result-title {
+    flex: 1;
+    min-width: 0; /* Prevent overflow */
+}

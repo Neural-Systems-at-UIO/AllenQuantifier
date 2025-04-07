@@ -41,7 +41,7 @@ def get_ensembl(symbol):
 synonym_list = []
 ensembl_list = []
 description_list = []
-
+gene= [genes[0]]
 for gene in tqdm(genes[genes.index(gene):]):
     synonyms, description = get_synonyms(gene)
     ensembl = get_ensembl(gene)
