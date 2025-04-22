@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mouse Brain Gene Portal</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"><!-- Add this before Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
@@ -13,12 +17,44 @@
             <h1>Mouse Brain Gene Portal</h1>
             <p>Search for genes to see the spatial expression in the mouse brain</p>
         </header>
-        
+
         <div class="search-container">
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search for gene name or Ensembl ID">
                 <button id="searchButton"><i class="fas fa-search"></i></button>
             </div>
+            <div class="sort-options">
+                <label>
+                    <input type="radio" name="sortBy" value="animals" checked> Sort by number of animals
+                </label>
+                <label>
+                    <input type="radio" name="sortBy" value="structure"> Sort by structure metrics
+                </label>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="structureSelect" id="structureLabel">Brain Structure:</label>
+                    <select id="structureSelect">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="metricSelect" id="metricLabel">Metric:</label>
+                    <select id="metricSelect">
+                        <option value="specificity">Specificity</option>
+                        <option value="intensity">Intensity</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sortOrder">Sort Order:</label>
+                    <select id="sortOrder">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+            </div>
+            
             <div class="filter-options">
                 <span>Results: </span>
                 <span id="resultCount">0</span>

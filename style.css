@@ -420,3 +420,168 @@ footer {
     flex: 1;
     min-width: 0; /* Prevent overflow */
 }
+
+.filter-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.filter-group select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    background-color: white;
+    min-width: 150px;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-group select {
+        width: 100%;
+    }
+}
+.metric-value {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    background-color: rgba(114, 206, 240, 0.1);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+}
+
+.metric-label {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.metric-number {
+    font-family: monospace;
+}
+
+/* Add to your CSS */
+select:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.sort-options {
+    margin-bottom: 15px;
+}
+
+.sort-options label {
+    margin-right: 15px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.sort-options input[type="radio"] {
+    margin-right: 5px;
+}
+
+/* Update your existing select:disabled rule */
+select:disabled, 
+select[disabled] {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Add this to make the labels match the disabled state */
+.filter-group label[for="structureSelect"][disabled],
+.filter-group label[for="metricSelect"][disabled] {
+    color: #999;
+}
+
+.disabled {
+    color: #999;
+    cursor: not-allowed;
+}
+
+select:disabled, 
+select[disabled] {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+/* Add more spacing between metric values */
+.metric-values {
+    display: flex;
+    gap: 1.5rem; /* Increased from whatever it was before */
+    margin-right: 1rem;
+}
+
+.metric-value {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+}
+
+.metric-number {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Add these styles to your CSS file */
+
+/* Style for disabled Select2 container */
+.select2-container--default.select2-container--disabled .select2-selection--single {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Style for disabled Select2 dropdown arrow */
+.select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow {
+    opacity: 0.5;
+}
+
+/* Style for disabled Select2 dropdown options */
+.select2-container--disabled .select2-selection--multiple {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Make sure the disabled state matches your other dropdowns */
+.select2-container--disabled {
+    opacity: 0.8;
+}
