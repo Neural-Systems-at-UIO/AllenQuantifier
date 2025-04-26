@@ -60,16 +60,15 @@ header p {
     padding: 1.5rem;
     margin-bottom: 2rem;
     width: 100%;
-    max-width: 1200px; /* Match results container */
-    margin-left: auto;
-    margin-right: auto;
-    min-width: 1200px; /* Add this line to prevent width changes */
+    max-width: 1400px; /* Changed from 1200px to match results */
+    margin: 0 auto 2rem;
 }
+
 
 .search-box {
     display: flex;
     margin-bottom: 1rem;
-    width: 100%; /* Ensure it fills container */
+    width: 100%;
 }
 
 .search-box input {
@@ -79,11 +78,8 @@ header p {
     border-radius: var(--border-radius) 0 0 var(--border-radius);
     font-size: 1rem;
     transition: var(--transition);
-    min-width: 300px; /* Minimum width before responsive adjustments */
+    min-width: 300px;
 }
-
-/* Keep all other existing styles... */
-
 
 .search-box input:focus {
     outline: none;
@@ -105,20 +101,36 @@ header p {
     background-color: var(--secondary-color);
 }
 
-.filter-options {
+.filter-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
     display: flex;
     align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
     font-size: 0.9rem;
-    color: #6c757d;
+    color: #555;
 }
 
-.filter-options span {
-    margin-right: 0.5rem;
+.filter-group select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    background-color: white;
+    min-width: 150px;
 }
 
-#resultCount {
-    font-weight: bold;
-    color: var(--primary-color);
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
 }
 
 /* Results Container */
@@ -126,8 +138,9 @@ header p {
     background-color: white;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    padding: 1.5rem 3rem;
-    max-width: 1200px;
+    padding: 1.5rem 2rem;
+    max-width: 1400px;
+    width: 100%; /* Ensure it takes full width */
     margin: 0 auto;
     min-height: 300px;
     position: relative;
@@ -145,6 +158,7 @@ header p {
 /* Result Cards */
 .result-item {
     width: 100%;
+    min-width: 100%; /* Prevent any shrinking */
     margin-bottom: 15px;
     border-radius: var(--border-radius);
     background-color: white;
@@ -153,7 +167,6 @@ header p {
     overflow: hidden;
     min-height: 140px;
 }
-
 .result-link {
     display: block;
     padding: 25px;
@@ -169,6 +182,9 @@ header p {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
+    gap: 15px;
+    flex-wrap: wrap;
+    min-height: 60px; /* Ensure consistent height */
 }
 
 .result-header i {
@@ -189,6 +205,8 @@ header p {
 
 .result-title {
     flex: 1;
+    min-width: 300px;
+    max-width: 600px; /* Limit expansion */
 }
 
 .gene-name {
@@ -217,6 +235,7 @@ header p {
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px solid #eee;
+    min-height: 40px; /* Consistent height */
 }
 
 .meta-section {
@@ -232,6 +251,88 @@ header p {
 
 .meta-value {
     color: #555;
+}
+
+/* Metric Values */
+.metric-values {
+    display: flex;
+    gap: 1.5rem;
+    margin-right: 1rem;
+    flex-wrap: wrap;
+}
+
+.metric-value {
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+    padding: 5px 10px;
+    background-color: rgba(114, 206, 240, 0.1);
+    border-radius: var(--border-radius);
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+}
+
+.metric-number {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.mouse-count {
+    display: flex;
+    align-items: center;
+    color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    min-width: 120px; /* Fixed width */
+    justify-content: center;
+}
+
+.mouse-count i {
+    margin-right: 5px;
+    font-size: 0.9em;
+}
+
+/* Info Box */
+.metrics-info {
+    margin-top: 1rem;
+    position: relative;
+}
+
+.info-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+.info-box {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-top: 0.5rem;
+    padding: 1rem;
+    display: none;
+}
+
+.info-box h4 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.info-box ul {
+    padding-left: 1.5rem;
+}
+
+.info-box li {
+    margin-bottom: 0.5rem;
 }
 
 /* Loading State */
@@ -318,7 +419,53 @@ footer {
     text-align: center;
 }
 
+/* Disabled States */
+select:disabled, 
+select[disabled] {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.disabled {
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Select2 Overrides */
+.select2-container--default.select2-container--disabled .select2-selection--single {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow {
+    opacity: 0.5;
+}
+
+.select2-container--disabled .select2-selection--multiple {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .search-container {
+        width: calc(100% - 4rem);
+    }
+    
+    .metric-values {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .info-box {
+        width: 350px;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -340,120 +487,10 @@ footer {
         padding: 1.5rem;
     }
     
-    .gene-meta {
+    .gene-meta, .metric-values {
         grid-template-columns: 1fr;
     }
-}
-
-@media (min-width: 992px) {
-    .gene-meta {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-@media (max-width: 1200px) {
-    .search-container {
-        min-width: auto; /* Allow shrinking on smaller screens */
-        width: calc(100% - 4rem); /* Match container padding */
-    }
-}
-/* Add to your CSS file */
-.animal-count {
-    display: flex;
-    align-items: center;
-    margin-right: 15px;
-    color: var(--primary-color);
-    font-weight: bold;
-}
-
-.animal-count i {
-    margin-right: 5px;
-    font-size: 0.9em;
-}
-
-.animal-count span {
-    font-size: 0.9em;
-}
-
-/* Adjust the result-header to accommodate the new element */
-.result-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    justify-content: space-between;
-}
-
-.result-title {
-    flex: 1;
-    margin-right: 15px;
-}
-/* Replace the previous .animal-count styles with these: */
-.mouse-count {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-    color: var(--primary-color);
-    background-color: rgba(67, 97, 238, 0.1);
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-}
-
-.mouse-count-inner {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.mouse-count i {
-    font-size: 0.9em;
-}
-
-/* Adjust the result-header spacing */
-.result-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    gap: 15px;
-}
-
-.result-title {
-    flex: 1;
-    min-width: 0; /* Prevent overflow */
-}
-
-.filter-row {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.filter-group label {
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.filter-group select {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    font-size: 0.9rem;
-    background-color: white;
-    min-width: 150px;
-}
-
-.filter-group select:focus {
-    outline: none;
-    border-color: var(--accent-color);
-}
-
-@media (max-width: 768px) {
+    
     .filter-row {
         flex-direction: column;
         gap: 10px;
@@ -466,122 +503,82 @@ footer {
     .filter-group select {
         width: 100%;
     }
+    
+    .info-box {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
 }
-.metric-value {
+
+.result-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto; /* Fixed layout */
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 15px;
+    min-height: 60px;
+}
+
+.result-title {
+    min-width: 300px;
+    max-width: 600px;
+    /* Remove flex property */
+}
+
+.mouse-count {
     display: flex;
     align-items: center;
-    margin-right: 20px;
-    background-color: rgba(114, 206, 240, 0.1);
+    color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 0.9rem;
-    color: var(--primary-color);
+    width: 120px; /* Fixed width */
+    justify-content: center;
+    margin-left: auto; /* Push to the right */
 }
 
-.metric-label {
-    font-weight: 600;
-    margin-right: 5px;
+.link-icon {
+    color: var(--accent-color);
+    opacity: 0.7;
+    width: 20px; /* Fixed width */
+    text-align: center;
 }
 
-.metric-number {
-    font-family: monospace;
-}
-
-/* Add to your CSS */
-select:disabled {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
-}
-
-.sort-options {
-    margin-bottom: 15px;
-}
-
-.sort-options label {
-    margin-right: 15px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-}
-
-.sort-options input[type="radio"] {
-    margin-right: 5px;
-}
-
-/* Update your existing select:disabled rule */
-select:disabled, 
-select[disabled] {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-/* Add this to make the labels match the disabled state */
-.filter-group label[for="structureSelect"][disabled],
-.filter-group label[for="metricSelect"][disabled] {
-    color: #999;
-}
-
-.disabled {
-    color: #999;
-    cursor: not-allowed;
-}
-
-select:disabled, 
-select[disabled] {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-/* Add more spacing between metric values */
 .metric-values {
-    display: flex;
-    gap: 1.5rem; /* Increased from whatever it was before */
-    margin-right: 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Always 4 columns */
+    gap: 1rem;
+    width: 100%;
+    min-width: 600px; /* Fixed minimum width */
+    visibility: hidden; /* Hide instead of display:none */
+    height: 0;
+    transition: var(--transition);
 }
 
-.metric-value {
-    display: flex;
-    flex-direction: column;
+/* When metrics should be visible */
+.show-metrics .metric-values {
+    visibility: visible;
+    height: auto;
+    margin: 15px 0;
 }
 
-.metric-label {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 0.2rem;
+.search-container {
+    width: 100%;
+    max-width: 1400px;
+    min-width: 1400px; /* Prevent any resizing */
+    margin: 0 auto 2rem;
+    /* Other existing properties */
 }
 
-.metric-number {
-    font-weight: bold;
-    font-size: 1rem;
-}
-
-/* Add these styles to your CSS file */
-
-/* Style for disabled Select2 container */
-.select2-container--default.select2-container--disabled .select2-selection--single {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-/* Style for disabled Select2 dropdown arrow */
-.select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow {
-    opacity: 0.5;
-}
-
-/* Style for disabled Select2 dropdown options */
-.select2-container--disabled .select2-selection--multiple {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
-}
-
-/* Make sure the disabled state matches your other dropdowns */
-.select2-container--disabled {
-    opacity: 0.8;
+.results-container {
+    width: 100%;
+    max-width: 1400px;
+    min-width: 1400px; /* Prevent any resizing */
+    /* Other existing properties */
 }

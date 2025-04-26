@@ -39,9 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
             structuresList = JSON.parse(decompressedData);
             
             // Populate structure dropdown
-            structureSelect.innerHTML = ''; // Clear existing options
+            structureSelect.innerHTML = '';
             
-            // Add a default empty option (optional)
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Select a structure...';
@@ -54,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 structureSelect.appendChild(option);
             });
             
-            // Initialize Select2 after a small delay to ensure DOM is ready
             setTimeout(() => {
                 $(structureSelect).select2({
                     placeholder: "Search for a structure...",
@@ -62,64 +60,55 @@ document.addEventListener('DOMContentLoaded', function() {
                     width: '100%',
                     dropdownAutoWidth: true,
                     minimumResultsForSearch: 1,
-                    dropdownParent: $('.search-container') // Add this line
+                    dropdownParent: $('.search-container')
                 });
                 
-                // Handle Select2 change event
                 $(structureSelect).on('change', async function() {
                     await updateGeneMetrics();
                 });
             }, 100);
             
             if (structuresList.length > 0) {
-                // Select first structure by default if needed
                 setTimeout(() => {
                     $(structureSelect).val(structuresList[0]).trigger('change');
-                    updateGeneMetrics(); // Load data for the first structure
+                    updateGeneMetrics();
                 }, 200);
             }
         } catch (error) {
             console.error('Error loading structures list:', error);
         }
     }
-    // Load structure-specific data when selected
-        // Modified loadStructureData function to handle formatted names
-        async function loadStructureData(structure, metric) {
-            if (!structure) return {};
+
+    async function loadStructureData(structure, metric) {
+        if (!structure) return {};
+        
+        try {
+            const safeStructureName = structure.replace(/[\\/]/g, '_');
+            const response = await fetch(`data/${safeStructureName}_${metric}.json.gz`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
-            try {
-                // Create safe filename by replacing slashes/backslashes
-                const safeStructureName = structure.replace(/[\\/]/g, '_');
-                const response = await fetch(`data/${safeStructureName}_${metric}.json.gz`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const compressedData = await response.arrayBuffer();
-                const decompressedData = pako.inflate(compressedData, { to: 'string' });
-                return JSON.parse(decompressedData);
-                
-            } catch (error) {
-                console.error(`Error loading ${metric} data for ${structure}:`, error);
-                return {};
-            }
+            const compressedData = await response.arrayBuffer();
+            const decompressedData = pako.inflate(compressedData, { to: 'string' });
+            return JSON.parse(decompressedData);
+        } catch (error) {
+            console.error(`Error loading ${metric} data for ${structure}:`, error);
+            return {};
         }
-    // Add Pagination Controls function
+    }
+    
     function addPaginationControls() {
         const totalPages = Math.ceil(filteredData.length / itemsPerPage);
         
-        // Remove any existing pagination controls
         const existingPagination = document.querySelector('.pagination');
         if (existingPagination) {
             existingPagination.remove();
         }
-        // Add this to your event listeners section
-
-        // Don't show pagination if no results or only one page
+        
         if (filteredData.length === 0 || totalPages <= 1) return;
         
         const paginationContainer = document.createElement('div');
         paginationContainer.className = 'pagination';
         
-        // Previous button
         const prevButton = document.createElement('button');
         prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
         prevButton.disabled = currentPage === 1;
@@ -131,12 +120,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Page info
         const pageInfo = document.createElement('span');
         pageInfo.className = 'page-info';
         pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
         
-        // Next button
         const nextButton = document.createElement('button');
         nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
         nextButton.disabled = currentPage === totalPages;
@@ -155,7 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
         resultsList.appendChild(paginationContainer);
     }
     
-    // Modified loadFileData function
     async function loadFileData() {
         try {
             console.log("Starting data load...");
@@ -178,16 +164,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const rawData = JSON.parse(decompressedData);
             console.log("Parsed JSON data keys:", Object.keys(rawData));
             
-            // Convert parallel arrays to array of gene objects
             fileData = rawData.gene_name.map((name, index) => ({
                 gene_name: name,
                 gene_description: rawData.gene_description[index],
                 synonyms: rawData.synonyms[index] || [],
                 ensembl_ids: rawData.ensembl_ids[index] || [],
                 number_of_animals: rawData.number_of_animals[index] || 0,
-                // Initialize structure-specific metrics
                 specificity: 0,
-                intensity: 0
+                intensity: 0,
+                expression_pct: 0,
+                expression_specificity: 0
             }));
             
             console.log("First gene object:", fileData[0]);
@@ -218,11 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let valA, valB;
             
             if (sortBy === 'structure' && selectedStructure) {
-                // Sort by the selected structure metric
                 valA = a[selectedMetric] || 0;
                 valB = b[selectedMetric] || 0;
             } else {
-                // Default sort by number of animals
                 valA = a.number_of_animals;
                 valB = b.number_of_animals;
             }
@@ -230,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return isDescending ? valB - valA : valA - valB;
         });
     }
+    
     function displayResults() {
         console.log("Displaying results. Total:", filteredData.length);
         
@@ -253,24 +238,11 @@ document.addEventListener('DOMContentLoaded', function() {
             li.className = 'result-item';
             const filePath = `https://atlases.ebrains.eu/viewer-staging/#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fbuckets%2Fdeepslice%2Fexpression_volumes%2F${encodeURIComponent(gene.gene_name)}_interp_25um.nii.gz`;
             
-            // Only show metrics when sorting by structure
-            let metricDisplay = '';
-            if (isStructureSort && selectedStructure) {
-                const specificityValue = gene.specificity ? gene.specificity.toFixed(3) : 'N/A';
-                const intensityValue = gene.intensity ? gene.intensity.toFixed(3) : 'N/A';
-                metricDisplay = `
-                    <div class="metric-values">
-                        <div class="metric-value">
-                            <span class="metric-label">Specificity:</span>
-                            <span class="metric-number">${specificityValue}</span>
-                        </div>
-                        <div class="metric-value">
-                            <span class="metric-label">Intensity:</span>
-                            <span class="metric-number">${intensityValue}</span>
-                        </div>
-                    </div>
-                `;
-            }
+            // Always include metrics in the DOM but control visibility with class
+            const specificityValue = gene.specificity ? gene.specificity.toFixed(3) : 'N/A';
+            const intensityValue = gene.intensity ? gene.intensity.toFixed(3) : 'N/A';
+            const expressionPctValue = gene.expression_pct ? (gene.expression_pct * 100).toFixed(1) + '%' : 'N/A';
+            const expressionSpecValue = gene.expression_specificity ? gene.expression_specificity.toFixed(3) : 'N/A';
             
             li.innerHTML = `
                 <a href="${filePath}" target="_blank" class="result-link">
@@ -284,8 +256,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-paw"></i>
                             <span>${gene.number_of_animals} mice</span>
                         </div>
-                        ${metricDisplay}
                         <i class="fas fa-external-link-alt link-icon"></i>
+                    </div>
+                    
+                    <div class="metric-values">
+                     <div class="metric-value">
+                            <span class="metric-label">Coverage:</span>
+                            <span class="metric-number">${expressionPctValue}</span>
+                        </div>
+                        <div class="metric-value">
+                            <span class="metric-label">Specificity of Coverage:</span>
+                            <span class="metric-number">${expressionSpecValue}</span>
+                        </div>
+                                    <div class="metric-value">
+                            <span class="metric-label">Intensity:</span>
+                            <span class="metric-number">${intensityValue}</span>
+                        </div>
+                        <div class="metric-value">
+                            <span class="metric-label">Specificity of Intensity:</span>
+                            <span class="metric-number">${specificityValue}</span>
+                        </div>
+            
+   
                     </div>
                     
                     <div class="gene-meta">
@@ -306,22 +298,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a>
             `;
             
+            // Toggle metrics visibility without affecting layout
+            if (isStructureSort && selectedStructure) {
+                li.classList.add('show-metrics');
+            } else {
+                li.classList.remove('show-metrics');
+            }
+            
             resultsList.appendChild(li);
         });
         
         addPaginationControls();
-    }
-    
+    }    
     async function updateGeneMetrics() {
         const structure = structureSelect.value;
-        const metric = metricSelect.value;
         
         if (!structure) {
-            // Reset metrics if no structure selected
             fileData.forEach(gene => {
                 gene.specificity = 0;
                 gene.intensity = 0;
-                gene.inStructure = true; // Flag all genes as valid when no structure is selected
+                gene.expression_pct = 0;
+                gene.expression_specificity = 0;
+                gene.inStructure = true;
             });
             return;
         }
@@ -329,34 +327,37 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingIndicator.style.display = 'flex';
         
         try {
-            // Load both specificity and intensity data for the selected structure
-            const specificityData = await loadStructureData(structure, 'specificity');
-            const intensityData = await loadStructureData(structure, 'intensity');
-            console.log('intensityData')
-            console.log(intensityData)
-            // Update gene data with metrics and set inStructure flag
+            const [specificityData, intensityData, expressionPctData, expressionSpecData] = await Promise.all([
+                loadStructureData(structure, 'specificity'),
+                loadStructureData(structure, 'intensity'),
+                loadStructureData(structure, 'expression_pct'),
+                loadStructureData(structure, 'expression_specificity')
+            ]);
+            
             fileData.forEach(gene => {
                 if (specificityData.hasOwnProperty(gene.gene_name)) {
                     gene.specificity = specificityData[gene.gene_name] || 0;
                     gene.intensity = intensityData[gene.gene_name] || 0;
+                    gene.expression_pct = expressionPctData[gene.gene_name] || 0;
+                    gene.expression_specificity = expressionSpecData[gene.gene_name] || 0;
                     gene.inStructure = true;
                 } else {
                     gene.specificity = 0;
                     gene.intensity = 0;
+                    gene.expression_pct = 0;
+                    gene.expression_specificity = 0;
                     gene.inStructure = false;
                 }
             });
             
-            // Re-filter and sort
             searchFiles(searchInput.value);
-            
         } catch (error) {
             console.error('Error updating gene metrics:', error);
         } finally {
             loadingIndicator.style.display = 'none';
         }
     }
-    // Modified search function to consider structure presence
+    
     function searchFiles(query) {
         console.group("Search Execution");
         try {
@@ -368,18 +369,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!lowerQuery) {
                 console.log("Empty query - showing all results");
                 filteredData = fileData.filter(gene => {
-                    // If a structure is selected, only include genes present in that structure
                     return !selectedStructure || gene.inStructure;
                 });
             } else {
                 console.log("Filtering data...");
                 filteredData = fileData.filter(gene => {
-                    // First check if gene is in structure (if a structure is selected)
                     if (selectedStructure && !gene.inStructure) {
                         return false;
                     }
                     
-                    // Then check search criteria
                     const searchFields = [
                         gene.gene_name,
                         gene.gene_description,
@@ -400,41 +398,58 @@ document.addEventListener('DOMContentLoaded', function() {
             console.groupEnd();
         }
     }
-  // Event listeners
-  searchButton.addEventListener('click', () => {
-    searchFiles(searchInput.value);
-});
 
-searchInput.addEventListener('input', () => {
-    searchFiles(searchInput.value);
-});
+    // Event listeners
+    searchButton.addEventListener('click', () => {
+        searchFiles(searchInput.value);
+    });
 
-// Single event listener for sortBy radio buttons
-document.querySelectorAll('input[name="sortBy"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        toggleStructureControls();
+    searchInput.addEventListener('input', () => {
+        searchFiles(searchInput.value);
+    });
+
+    document.querySelectorAll('input[name="sortBy"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            toggleStructureControls();
+            sortResults();
+            displayResults();
+        });
+    });
+
+    structureSelect.addEventListener('change', async () => {
+        await updateGeneMetrics();
+    });
+
+    metricSelect.addEventListener('change', () => {
         sortResults();
         displayResults();
     });
-});
 
-// Listen for changes in structure, metric, or sort order
-structureSelect.addEventListener('change', async () => {
-    await updateGeneMetrics();
-});
+    sortOrder.addEventListener('change', () => {
+        sortResults();
+        displayResults();
+    });
+    const metricsInfoButton = document.getElementById('metricsInfoButton');
+    const metricsInfoBox = document.getElementById('metricsInfoBox');
+    const closeInfoBox = document.getElementById('closeInfoBox');
 
-metricSelect.addEventListener('change', () => {
-    sortResults();
-    displayResults();
-});
+    metricsInfoButton.addEventListener('click', () => {
+        metricsInfoBox.style.display = 'block';
+    });
 
-sortOrder.addEventListener('change', () => {
-    sortResults();
-    displayResults();
-});
+    closeInfoBox.addEventListener('click', () => {
+        metricsInfoBox.style.display = 'none';
+    });
 
-// Initial load
-toggleStructureControls(); // Set initial disabled state
-loadStructuresList();
-loadFileData();
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!metricsInfoBox.contains(e.target) && e.target !== metricsInfoButton) {
+            metricsInfoBox.style.display = 'none';
+        }
+    });
+
+    // Initial load
+    toggleStructureControls();
+    loadStructuresList();
+    loadFileData();
 });

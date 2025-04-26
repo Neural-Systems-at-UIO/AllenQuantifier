@@ -42,8 +42,11 @@
                 <div class="filter-group">
                     <label for="metricSelect" id="metricLabel">Metric:</label>
                     <select id="metricSelect">
-                        <option value="specificity">Specificity</option>
+                        <option value="expression_pct">Coverage</option>
+                        <option value="expression_specificity">  Specificity of Coverage</option>
                         <option value="intensity">Intensity</option>
+                        <option value="specificity">Specificity of Intensity</option>
+         
                     </select>
                 </div>
                 <div class="filter-group">
@@ -58,6 +61,25 @@
             <div class="filter-options">
                 <span>Results: </span>
                 <span id="resultCount">0</span>
+            </div>
+            <div class="metrics-info">
+                <button id="metricsInfoButton" class="info-button">
+                    <i class="fas fa-info-circle"></i> About Metrics
+                </button>
+                <div id="metricsInfoBox" class="info-box">
+                    <h4>Metric Definitions:</h4>
+                    <ul>
+                        <li><strong>Coverage:</strong> The percentage of this structure where the gene is detectibly expressed.</li>
+                        <li><strong>Specificity of Coverage:</strong> Compares the coverage of gene expression inside the region with the coverage in the rest of the brain.</li>
+                        <li><strong>Intensity:</strong> The average expression level of the gene in this structure.</li>
+                        <li><strong>Specificity of Intensity:</strong> Compares the mean intensity of gene expression inside the region with the mean intensity in the rest of the brain.</li>
+
+
+                    </ul>
+                    <button id="closeInfoBox" class="close-button">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
             </div>
         </div>
         
