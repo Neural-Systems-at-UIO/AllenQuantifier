@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // DOM elements
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sortOrder = document.getElementById('sortOrder');
     const structureLabel = document.getElementById('structureLabel');
     const metricLabel = document.getElementById('metricLabel');
-    
+
     // Pagination variables
     const itemsPerPage = 10;
     let currentPage = 1;
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let fileData = [];
     let structureData = {};
     let structuresList = [];
-    
+
     // Toggle structure/metric controls based on sort selection
     function toggleStructureControls() {
         const isStructureSort = document.querySelector('input[name="sortBy"][value="structure"]').checked;
@@ -27,32 +27,32 @@ document.addEventListener('DOMContentLoaded', function() {
         structureLabel.classList.toggle('disabled', !isStructureSort);
         metricLabel.classList.toggle('disabled', !isStructureSort);
     }
-    
+
     // Load structures list
     async function loadStructuresList() {
         try {
             const response = await fetch('data/structure_names.json.gz');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
+
             const compressedData = await response.arrayBuffer();
             const decompressedData = pako.inflate(compressedData, { to: 'string' });
             structuresList = JSON.parse(decompressedData);
-            
+
             // Populate structure dropdown
             structureSelect.innerHTML = '';
-            
+
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Select a structure...';
             structureSelect.appendChild(defaultOption);
-            
+
             structuresList.forEach(structure => {
                 const option = document.createElement('option');
                 option.value = structure;
                 option.textContent = structure;
                 structureSelect.appendChild(option);
             });
-            
+
             setTimeout(() => {
                 $(structureSelect).select2({
                     placeholder: "Search for a structure...",
@@ -62,12 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     minimumResultsForSearch: 1,
                     dropdownParent: $('.search-container')
                 });
-                
-                $(structureSelect).on('change', async function() {
+
+                $(structureSelect).on('change', async function () {
                     await updateGeneMetrics();
                 });
             }, 100);
-            
+
             if (structuresList.length > 0) {
                 setTimeout(() => {
                     $(structureSelect).val(structuresList[0]).trigger('change');
@@ -81,12 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadStructureData(structure, metric) {
         if (!structure) return {};
-        
+
         try {
             const safeStructureName = structure.replace(/[\\/]/g, '_');
             const response = await fetch(`data/${safeStructureName}_${metric}.json.gz`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
+
             const compressedData = await response.arrayBuffer();
             const decompressedData = pako.inflate(compressedData, { to: 'string' });
             return JSON.parse(decompressedData);
@@ -95,20 +95,20 @@ document.addEventListener('DOMContentLoaded', function() {
             return {};
         }
     }
-    
+
     function addPaginationControls() {
         const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        
+
         const existingPagination = document.querySelector('.pagination');
         if (existingPagination) {
             existingPagination.remove();
         }
-        
+
         if (filteredData.length === 0 || totalPages <= 1) return;
-        
+
         const paginationContainer = document.createElement('div');
         paginationContainer.className = 'pagination';
-        
+
         const prevButton = document.createElement('button');
         prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
         prevButton.disabled = currentPage === 1;
@@ -119,11 +119,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
-        
+
         const pageInfo = document.createElement('span');
         pageInfo.className = 'page-info';
         pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-        
+
         const nextButton = document.createElement('button');
         nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
         nextButton.disabled = currentPage === totalPages;
@@ -134,36 +134,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
-        
+
         paginationContainer.appendChild(prevButton);
         paginationContainer.appendChild(pageInfo);
         paginationContainer.appendChild(nextButton);
-        
+
         resultsList.appendChild(paginationContainer);
     }
-    
+
     async function loadFileData() {
         try {
             console.log("Starting data load...");
             loadingIndicator.style.display = 'flex';
             resultsList.style.display = 'none';
-            
+
             const response = await fetch('data/gene_data_counts.json.gz');
             console.log("Fetch response status:", response.status);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const compressedData = await response.arrayBuffer();
             console.log("Got compressed data, length:", compressedData.byteLength);
-            
+
             const decompressedData = pako.inflate(compressedData, { to: 'string' });
             console.log("Decompressed data length:", decompressedData.length);
-            
+
             const rawData = JSON.parse(decompressedData);
             console.log("Parsed JSON data keys:", Object.keys(rawData));
-            
+
             fileData = rawData.gene_name.map((name, index) => ({
                 gene_name: name,
                 gene_description: rawData.gene_description[index],
@@ -175,15 +175,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 expression_pct: 0,
                 expression_specificity: 0
             }));
-            
+
             console.log("First gene object:", fileData[0]);
             console.log("Total genes:", fileData.length);
-            
+
             filteredData = [...fileData];
             sortResults();
             displayResults();
             loadingIndicator.style.display = 'none';
-            
+
         } catch (error) {
             console.error('Full error:', error);
             loadingIndicator.innerHTML = `
@@ -193,16 +193,16 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     }
-    
+
     function sortResults() {
         const selectedStructure = structureSelect.value;
         const selectedMetric = metricSelect.value;
         const isDescending = sortOrder.value === 'desc';
         const sortBy = document.querySelector('input[name="sortBy"]:checked').value;
-        
+
         filteredData.sort((a, b) => {
             let valA, valB;
-            
+
             if (sortBy === 'structure' && selectedStructure) {
                 valA = a[selectedMetric] || 0;
                 valB = b[selectedMetric] || 0;
@@ -210,40 +210,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 valA = a.number_of_animals;
                 valB = b.number_of_animals;
             }
-            
+
             return isDescending ? valB - valA : valA - valB;
         });
     }
-    
+
     function displayResults() {
         console.log("Displaying results. Total:", filteredData.length);
-        
+
         resultsList.style.display = 'block';
         loadingIndicator.style.display = 'none';
         resultsList.innerHTML = '';
         resultCount.textContent = filteredData.length;
-        
+
         if (filteredData.length === 0) {
             resultsList.innerHTML = '<li class="result-item no-results">No matching genes found. Try a different search term.</li>';
             return;
         }
-        
+
         const startIndex = (currentPage - 1) * itemsPerPage;
         const paginatedItems = filteredData.slice(startIndex, startIndex + itemsPerPage);
         const selectedStructure = structureSelect.value;
         const isStructureSort = document.querySelector('input[name="sortBy"][value="structure"]').checked;
-        
+
         paginatedItems.forEach(gene => {
             const li = document.createElement('li');
             li.className = 'result-item';
             const filePath = `https://atlases.ebrains.eu/viewer-staging/#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fbuckets%2Fdeepslice%2Fexpression_volumes%2F${encodeURIComponent(gene.gene_name)}_interp_25um.nii.gz`;
-            
+
             // Always include metrics in the DOM but control visibility with class
             const specificityValue = gene.specificity ? gene.specificity.toFixed(3) : 'N/A';
             const intensityValue = gene.intensity ? gene.intensity.toFixed(3) : 'N/A';
             const expressionPctValue = gene.expression_pct ? (gene.expression_pct * 100).toFixed(1) + '%' : 'N/A';
             const expressionSpecValue = gene.expression_specificity ? gene.expression_specificity.toFixed(3) : 'N/A';
-            
+
             li.innerHTML = `
                 <a href="${filePath}" target="_blank" class="result-link">
                     <div class="result-header">
@@ -298,22 +298,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </a>
             `;
-            
+
             // Toggle metrics visibility without affecting layout
             if (isStructureSort && selectedStructure) {
                 li.classList.add('show-metrics');
             } else {
                 li.classList.remove('show-metrics');
             }
-            
+
             resultsList.appendChild(li);
         });
-        
+
         addPaginationControls();
-    }    
+    }
     async function updateGeneMetrics() {
         const structure = structureSelect.value;
-        
+
         if (!structure) {
             fileData.forEach(gene => {
                 gene.specificity = 0;
@@ -324,9 +324,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             return;
         }
-        
+
         loadingIndicator.style.display = 'flex';
-        
+
         try {
             const [specificityData, intensityData, expressionPctData, expressionSpecData] = await Promise.all([
                 loadStructureData(structure, 'specificity'),
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadStructureData(structure, 'expression_pct'),
                 loadStructureData(structure, 'expression_specificity')
             ]);
-            
+
             fileData.forEach(gene => {
                 if (specificityData.hasOwnProperty(gene.gene_name)) {
                     gene.specificity = specificityData[gene.gene_name] || 0;
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     gene.inStructure = false;
                 }
             });
-            
+
             searchFiles(searchInput.value);
         } catch (error) {
             console.error('Error updating gene metrics:', error);
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingIndicator.style.display = 'none';
         }
     }
-    
+
     function searchFiles(query) {
         console.group("Search Execution");
         try {
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const lowerQuery = query.toLowerCase().trim();
             const selectedStructure = structureSelect.value;
             console.log("Search query:", `"${lowerQuery}"`);
-            
+
             if (!lowerQuery) {
                 console.log("Empty query - showing all results");
                 filteredData = fileData.filter(gene => {
@@ -378,19 +378,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (selectedStructure && !gene.inStructure) {
                         return false;
                     }
-                    
+
                     const searchFields = [
                         gene.gene_name,
                         gene.gene_description,
                         ...(Array.isArray(gene.synonyms) ? gene.synonyms : [gene.synonyms]),
                         ...(Array.isArray(gene.ensembl_ids) ? gene.ensembl_ids : [gene.ensembl_ids])
                     ].filter(Boolean).map(f => String(f).toLowerCase());
-                    
+
                     return searchFields.some(field => field.includes(lowerQuery));
                 });
                 console.log(`Found ${filteredData.length} matches`);
             }
-            
+
             sortResults();
             displayResults();
         } catch (error) {

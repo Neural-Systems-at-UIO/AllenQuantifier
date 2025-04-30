@@ -64,7 +64,7 @@ def load_warped_image(
     target_resolution,
     mode,
     experiment_id,
-    metadata
+    metadata,
 ):
     affine_path = os.path.join(affine_folder_path, filename + "_SyN_affineTransfo.mat")
     nonlinear_path = os.path.join(
@@ -275,7 +275,7 @@ def id_to_volume(
             resolution,
             mode,
             experiment_id,
-            metadata
+            metadata,
         )
         if warped_image is None:
             continue
@@ -324,7 +324,7 @@ def gene_to_volume(
         )
         gene_volume += id_volume
         frequencies += id_frequency
-    mask = frequencies!=0
+    mask = frequencies != 0
     gene_volume[mask] = gene_volume[mask] / frequencies[mask]
     if missing_data_fill_value != 0:
         gene_volume[frequencies == 0] = missing_data_fill_value
@@ -332,6 +332,8 @@ def gene_to_volume(
         return gene_volume, frequencies
     else:
         return gene_volume
+
+
 def interpolate(gene_volume, frequency_volume, k, atlas):
     output_volume = gene_volume.copy()
     atlas_shape = np.array(atlas.shape)
@@ -359,7 +361,6 @@ def interpolate(gene_volume, frequency_volume, k, atlas):
     return output_volume
 
 
-
 # def interpolate_nan(volume, method="distance"):
 
 
@@ -378,9 +379,14 @@ import numpy as np
 
 ccfv3aAtlas, header = nrrd.read("ccfv3a.nrrd")
 
-def process_gene(gene, resolution, metadata, image_folder_path, path_to_registration_files):
-    ids = metadata[metadata["gene"].str.lower() == gene.lower()]['experiment_id']
-    output_volume = np.zeros((np.array(ccfv3aAtlas.shape) / (resolution/10)).astype(int))
+
+def process_gene(
+    gene, resolution, metadata, image_folder_path, path_to_registration_files
+):
+    ids = metadata[metadata["gene"].str.lower() == gene.lower()]["experiment_id"]
+    output_volume = np.zeros(
+        (np.array(ccfv3aAtlas.shape) / (resolution / 10)).astype(int)
+    )
     successful = 0
     for id in ids:
         gene_volume, frequency_volume = id_to_volume(
@@ -404,7 +410,7 @@ def process_gene(gene, resolution, metadata, image_folder_path, path_to_registra
     dims = output_volume.shape
     affine[:3, 3] = -0.5 * np.array(dims) * resolution
     z_offset = 700
-    affine[1,3] = -7300
+    affine[1, 3] = -7300
     # affine[1,3] -= z_offset
     img = nib.Nifti1Image(output_volume, affine)
     img.set_qform(affine, code=1)
@@ -418,13 +424,19 @@ def process_gene(gene, resolution, metadata, image_folder_path, path_to_registra
 # dict(img.header)
 start = 0
 # Use a ThreadPoolExecutor to parallelize gene processing
-with concurrent.futures.ThreadPoolExecutor(max_workers = 20) as executor:
-    list(tqdm(
-        executor.map(
-            lambda g: process_gene(g, resolution, metadata, image_folder_path, path_to_registration_files),
-            metadata['gene'].unique()[start:]
-        ),
-        total=len(metadata['gene'].unique()[start:])
-    ))
-
-
+with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+    list(
+        tqdm(
+            executor.map(
+                lambda g: process_gene(
+                    g,
+                    resolution,
+                    metadata,
+                    image_folder_path,
+                    path_to_registration_files,
+                ),
+                metadata["gene"].unique()[start:],
+            ),
+            total=len(metadata["gene"].unique()[start:]),
+        )
+    )

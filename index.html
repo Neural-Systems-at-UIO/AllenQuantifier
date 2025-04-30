@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +12,13 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1>Mouse Brain Gene Portal</h1>
             <p>Search for genes to see the spatial expression in the mouse brain</p>
         </header>
-
         <div class="search-container">
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search for gene name or Ensembl ID">
@@ -38,17 +39,14 @@
                         <!-- Options will be populated by JS -->
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label for="metricSelect" id="metricLabel">Metric:</label>
                     <select id="metricSelect">
-                        <option value="expression_specificity">  Specificity of Coverage</option>
+                        <option value="expression_specificity"> Specificity of Coverage</option>
                         <option value="expression_pct">Coverage</option>
 
                         <option value="specificity">Specificity of Intensity</option>
                         <option value="intensity">Intensity</option>
-
-         
                     </select>
                 </div>
                 <div class="filter-group">
@@ -59,7 +57,6 @@
                     </select>
                 </div>
             </div>
-            
             <div class="filter-options">
                 <span>Results: </span>
                 <span id="resultCount">0</span>
@@ -71,10 +68,13 @@
                 <div id="metricsInfoBox" class="info-box">
                     <h4>Metric Definitions:</h4>
                     <ul>
-                        <li><strong>Coverage:</strong> The percentage of this structure where the gene is detectibly expressed.</li>
-                        <li><strong>Specificity of Coverage:</strong> Compares the coverage of gene expression inside the region with the coverage in the rest of the brain.</li>
+                        <li><strong>Coverage:</strong> The percentage of this structure where the gene is detectibly
+                            expressed.</li>
+                        <li><strong>Specificity of Coverage:</strong> Compares the coverage of gene expression inside
+                            the region with the coverage in the rest of the brain.</li>
                         <li><strong>Intensity:</strong> The average expression level of the gene in this structure.</li>
-                        <li><strong>Specificity of Intensity:</strong> Compares the mean intensity of gene expression inside the region with the mean intensity in the rest of the brain.</li>
+                        <li><strong>Specificity of Intensity:</strong> Compares the mean intensity of gene expression
+                            inside the region with the mean intensity in the rest of the brain.</li>
 
 
                     </ul>
@@ -84,7 +84,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="results-container">
             <div id="loadingIndicator" class="loading">
                 <div class="spinner"></div>
@@ -93,8 +92,6 @@
             <ul id="resultsList"></ul>
         </div>
     </div>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="script.js"></script>
 </body>
