@@ -260,23 +260,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     
                     <div class="metric-values">
-                     <div class="metric-value">
-                            <span class="metric-label">Coverage:</span>
-                            <span class="metric-number">${expressionPctValue}</span>
-                        </div>
+           
                         <div class="metric-value">
                             <span class="metric-label">Specificity of Coverage:</span>
                             <span class="metric-number">${expressionSpecValue}</span>
                         </div>
-                                    <div class="metric-value">
-                            <span class="metric-label">Intensity:</span>
-                            <span class="metric-number">${intensityValue}</span>
+                                  <div class="metric-value">
+                            <span class="metric-label">Coverage:</span>
+                            <span class="metric-number">${expressionPctValue}</span>
                         </div>
+         
                         <div class="metric-value">
                             <span class="metric-label">Specificity of Intensity:</span>
                             <span class="metric-number">${specificityValue}</span>
                         </div>
-            
+                                       <div class="metric-value">
+                            <span class="metric-label">Intensity:</span>
+                            <span class="metric-number">${intensityValue}</span>
+                        </div>
    
                     </div>
                     
