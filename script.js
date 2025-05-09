@@ -199,10 +199,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedMetric = metricSelect.value;
         const isDescending = sortOrder.value === 'desc';
         const sortBy = document.querySelector('input[name="sortBy"]:checked').value;
-
+    
         filteredData.sort((a, b) => {
             let valA, valB;
-
+    
             if (sortBy === 'structure' && selectedStructure) {
                 valA = a[selectedMetric] || 0;
                 valB = b[selectedMetric] || 0;
@@ -210,40 +210,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 valA = a.number_of_animals;
                 valB = b.number_of_animals;
             }
-
+    
             return isDescending ? valB - valA : valA - valB;
         });
     }
-
     function displayResults() {
         console.log("Displaying results. Total:", filteredData.length);
-
+    
         resultsList.style.display = 'block';
         loadingIndicator.style.display = 'none';
         resultsList.innerHTML = '';
         resultCount.textContent = filteredData.length;
-
+    
         if (filteredData.length === 0) {
             resultsList.innerHTML = '<li class="result-item no-results">No matching genes found. Try a different search term.</li>';
             return;
         }
-
+    
         const startIndex = (currentPage - 1) * itemsPerPage;
         const paginatedItems = filteredData.slice(startIndex, startIndex + itemsPerPage);
         const selectedStructure = structureSelect.value;
         const isStructureSort = document.querySelector('input[name="sortBy"][value="structure"]').checked;
-
+    
         paginatedItems.forEach(gene => {
             const li = document.createElement('li');
             li.className = 'result-item';
             const filePath = `https://atlases.ebrains.eu/viewer-staging/#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fbuckets%2Fdeepslice%2Fexpression_volumes%2F${encodeURIComponent(gene.gene_name)}_interp_25um.nii.gz`;
-
-            // Always include metrics in the DOM but control visibility with class
+    
+            // Format values
             const specificityValue = gene.specificity ? gene.specificity.toFixed(3) : 'N/A';
             const intensityValue = gene.intensity ? gene.intensity.toFixed(3) : 'N/A';
             const expressionPctValue = gene.expression_pct ? (gene.expression_pct * 100).toFixed(1) + '%' : 'N/A';
             const expressionSpecValue = gene.expression_specificity ? gene.expression_specificity.toFixed(3) : 'N/A';
-
+    
             li.innerHTML = `
                 <a href="${filePath}" target="_blank" class="result-link">
                     <div class="result-header">
@@ -260,25 +259,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     
                     <div class="metric-values">
-           
                         <div class="metric-value">
                             <span class="metric-label">Specificity of Coverage:</span>
                             <span class="metric-number">${expressionSpecValue}</span>
+                            ${gene.expressionSpecRank ? `<span class="metric-rank">#${gene.expressionSpecRank}</span>` : ''}
                         </div>
-                                  <div class="metric-value">
+                        <div class="metric-value">
                             <span class="metric-label">Coverage:</span>
                             <span class="metric-number">${expressionPctValue}</span>
+                            ${gene.expressionPctRank ? `<span class="metric-rank">#${gene.expressionPctRank}</span>` : ''}
                         </div>
-         
                         <div class="metric-value">
                             <span class="metric-label">Specificity of Intensity:</span>
                             <span class="metric-number">${specificityValue}</span>
+                            ${gene.specificityRank ? `<span class="metric-rank">#${gene.specificityRank}</span>` : ''}
                         </div>
-                                       <div class="metric-value">
+                        <div class="metric-value">
                             <span class="metric-label">Intensity:</span>
                             <span class="metric-number">${intensityValue}</span>
+                            ${gene.intensityRank ? `<span class="metric-rank">#${gene.intensityRank}</span>` : ''}
                         </div>
-   
                     </div>
                     
                     <div class="gene-meta">
@@ -298,35 +298,40 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </a>
             `;
-
+    
             // Toggle metrics visibility without affecting layout
             if (isStructureSort && selectedStructure) {
                 li.classList.add('show-metrics');
             } else {
                 li.classList.remove('show-metrics');
             }
-
+    
             resultsList.appendChild(li);
         });
-
+    
         addPaginationControls();
     }
     async function updateGeneMetrics() {
         const structure = structureSelect.value;
-
+        
         if (!structure) {
             fileData.forEach(gene => {
                 gene.specificity = 0;
                 gene.intensity = 0;
                 gene.expression_pct = 0;
                 gene.expression_specificity = 0;
+                gene.overall = 0;
+                gene.specificityRank = 0;
+                gene.intensityRank = 0;
+                gene.expressionPctRank = 0;
+                gene.expressionSpecRank = 0;
                 gene.inStructure = true;
             });
             return;
         }
-
+        
         loadingIndicator.style.display = 'flex';
-
+        
         try {
             const [specificityData, intensityData, expressionPctData, expressionSpecData] = await Promise.all([
                 loadStructureData(structure, 'specificity'),
@@ -334,31 +339,87 @@ document.addEventListener('DOMContentLoaded', function () {
                 loadStructureData(structure, 'expression_pct'),
                 loadStructureData(structure, 'expression_specificity')
             ]);
-
+        
+            // First pass to collect all values for ranking
+            const allValues = {
+                specificity: [],
+                intensity: [],
+                expression_pct: [],
+                expression_specificity: []
+            };
+        
+            fileData.forEach(gene => {
+                if (specificityData.hasOwnProperty(gene.gene_name)) {
+                    allValues.specificity.push(specificityData[gene.gene_name] || 0);
+                    allValues.intensity.push(intensityData[gene.gene_name] || 0);
+                    allValues.expression_pct.push(expressionPctData[gene.gene_name] || 0);
+                    allValues.expression_specificity.push(expressionSpecData[gene.gene_name] || 0);
+                }
+            });
+        
+            // Create sorted arrays for each metric
+            const sortedMetrics = {};
+            Object.keys(allValues).forEach(metric => {
+                sortedMetrics[metric] = [...allValues[metric]].sort((a, b) => b - a); // Sort descending
+            });
+        
+            // Second pass to calculate overall score and store rankings
             fileData.forEach(gene => {
                 if (specificityData.hasOwnProperty(gene.gene_name)) {
                     gene.specificity = specificityData[gene.gene_name] || 0;
                     gene.intensity = intensityData[gene.gene_name] || 0;
                     gene.expression_pct = expressionPctData[gene.gene_name] || 0;
                     gene.expression_specificity = expressionSpecData[gene.gene_name] || 0;
+                    
+                    // Calculate and store rankings for each metric
+                    gene.specificityRank = sortedMetrics.specificity.indexOf(gene.specificity) + 1;
+                    gene.intensityRank = sortedMetrics.intensity.indexOf(gene.intensity) + 1;
+                    gene.expressionPctRank = sortedMetrics.expression_pct.indexOf(gene.expression_pct) + 1;
+                    gene.expressionSpecRank = sortedMetrics.expression_specificity.indexOf(gene.expression_specificity) + 1;
+                    
+                    // Calculate overall score with coverage weighted half as much
+                    const weights = {
+                        specificity: 1,
+                        intensity: 0.005,
+                        expression_pct: 0.012,  
+                        expression_specificity: 1
+                    };
+                    
+                    const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+                    
+                    const weightedRanks = [
+                        (gene.specificityRank / fileData.length) * weights.specificity,
+                        (gene.intensityRank / fileData.length) * weights.intensity,
+                        (gene.expressionPctRank / fileData.length) * weights.expression_pct,
+                        (gene.expressionSpecRank / fileData.length) * weights.expression_specificity
+                    ];
+                    
+                    gene.overall = 1 - (weightedRanks.reduce((a, b) => a + b, 0) / totalWeight);
+                    
                     gene.inStructure = true;
                 } else {
                     gene.specificity = 0;
                     gene.intensity = 0;
                     gene.expression_pct = 0;
                     gene.expression_specificity = 0;
+                    gene.overall = 0;
+                    gene.specificityRank = 0;
+                    gene.intensityRank = 0;
+                    gene.expressionPctRank = 0;
+                    gene.expressionSpecRank = 0;
                     gene.inStructure = false;
                 }
             });
-
+        
             searchFiles(searchInput.value);
         } catch (error) {
             console.error('Error updating gene metrics:', error);
         } finally {
             loadingIndicator.style.display = 'none';
         }
-    }
-
+    }        
+        
+        
     function searchFiles(query) {
         console.group("Search Execution");
         try {
